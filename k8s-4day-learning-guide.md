@@ -73,10 +73,14 @@ Hướng dẫn học Kubernetes trong 4 ngày dành cho developers - từ cơ b�
     type: ClusterIP
   ```
 
-- [ ] **Bài tập ngày 1**
-  - Tạo 3 pods nginx khác nhau
-  - Tạo service để kết nối các pods
-  - Test connectivity giữa các pods
+- [ ] **Bài tập ngày 1** 🔥
+  - Tạo 3 pods nginx với labels khác nhau
+  - Tạo 2 services: 1 ClusterIP và 1 NodePort
+  - Tạo pod với multiple containers (nginx + busybox)
+  - Test connectivity giữa các pods qua service
+  - Sử dụng `kubectl exec` để debug network issues
+  - Tạo pod với resource limits và requests
+  - Thử tạo pod với image không tồn tại và debug lỗi
 
 ---
 
@@ -165,11 +169,17 @@ Hướng dẫn học Kubernetes trong 4 ngày dành cho developers - từ cơ b�
         storage: 1Gi
   ```
 
-- [ ] **Bài tập ngày 2**
-  - Tạo deployment với 3 replicas
-  - Thêm ConfigMap và Secret
-  - Mount volume vào pod
-  - Test rolling update và rollback
+- [ ] **Bài tập ngày 2** 🔥🔥
+  - Tạo deployment với 5 replicas và resource limits
+  - Tạo 3 ConfigMaps khác nhau và mount vào deployment
+  - Tạo Secret với multiple keys và sử dụng trong pod
+  - Tạo PVC và mount vào pod, test data persistence
+  - Thực hiện rolling update với strategy: maxUnavailable=1, maxSurge=2
+  - Test rollback và xem history
+  - Tạo HPA (Horizontal Pod Autoscaler) cho deployment
+  - Tạo StatefulSet với persistent volume
+  - Test pod disruption và recovery
+  - Sử dụng `kubectl patch` để update deployment
 
 ---
 
@@ -275,11 +285,19 @@ Hướng dẫn học Kubernetes trong 4 ngày dành cho developers - từ cơ b�
     - Egress
   ```
 
-- [ ] **Bài tập ngày 3**
-  - Tạo 2 applications khác nhau
-  - Expose chúng qua Ingress với different paths
-  - Cấu hình SSL certificate
-  - Test network policies
+- [ ] **Bài tập ngày 3** 🔥🔥🔥
+  - Tạo 3 microservices: frontend (nginx), backend (nodejs), database (mysql)
+  - Tạo LoadBalancer service cho frontend
+  - Tạo Ingress với multiple hosts và paths
+  - Cấu hình SSL certificate với cert-manager
+  - Tạo NetworkPolicy để isolate database
+  - Test service discovery giữa các pods
+  - Tạo Headless service cho database
+  - Cấu hình Ingress với rate limiting
+  - Test canary deployment với Ingress
+  - Tạo ServiceAccount và RBAC cho applications
+  - Debug network connectivity issues
+  - Test pod-to-pod communication across namespaces
 
 ---
 
@@ -337,11 +355,22 @@ Hướng dẫn học Kubernetes trong 4 ngày dành cho developers - từ cơ b�
   - Security contexts
   - RBAC (Role-Based Access Control)
 
-- [ ] **Bài tập ngày 4**
-  - Tạo Helm chart cho ứng dụng
-  - Cấu hình monitoring
-  - Thiết lập CI/CD pipeline
-  - Áp dụng security best practices
+- [ ] **Bài tập ngày 4** 🔥🔥🔥🔥
+  - Tạo Helm chart với values.yaml cho 3 environments (dev, staging, prod)
+  - Cấu hình Prometheus monitoring với custom metrics
+  - Tạo Grafana dashboard cho application metrics
+  - Thiết lập CI/CD pipeline với GitHub Actions
+  - Implement blue-green deployment strategy
+  - Tạo Kubernetes Operator cho custom resource
+  - Cấu hình Pod Security Standards
+  - Implement admission controllers
+  - Tạo custom ResourceQuota và LimitRange
+  - Setup log aggregation với Fluentd/Fluent Bit
+  - Cấu hình backup strategy với Velero
+  - Test disaster recovery scenario
+  - Implement GitOps với ArgoCD
+  - Tạo custom Helm plugin
+  - Performance testing với load testing tools
 
 ---
 
@@ -400,37 +429,43 @@ Hướng dẫn học Kubernetes trong 4 ngày dành cho developers - từ cơ b�
 
 ---
 
-## 🎯 **Mục tiêu cuối khóa**
+## 🎯 **Mục tiêu cuối khóa (Try Hard Edition)**
 
 Sau 4 ngày, bạn sẽ có thể:
 
-✅ **Hiểu Kubernetes**: Kiến trúc, components, và concepts  
-✅ **Deploy Applications**: Từ development đến production  
-✅ **Manage Resources**: Pods, Services, Deployments, ConfigMaps  
-✅ **Networking**: Ingress, SSL, Network Policies  
-✅ **DevOps**: Helm, CI/CD, Monitoring  
-✅ **Troubleshooting**: Debug và fix issues  
-✅ **Best Practices**: Security, performance, reliability  
+✅ **Master Kubernetes**: Kiến trúc, components, và advanced concepts  
+✅ **Production Ready**: Deploy complex applications với high availability  
+✅ **Advanced Resource Management**: Pods, Services, Deployments, StatefulSets, Operators  
+✅ **Enterprise Networking**: Ingress, SSL, Network Policies, Service Mesh  
+✅ **DevOps Expert**: Helm, CI/CD, Monitoring, GitOps, Backup/Recovery  
+✅ **Troubleshooting Pro**: Debug complex issues, performance optimization  
+✅ **Security Expert**: RBAC, Pod Security, Admission Controllers, Compliance  
+✅ **Architecture Design**: Microservices, scalability, disaster recovery  
 
 ---
 
-## 🚀 **Next Steps**
+## 🚀 **Next Steps (Try Hard Path)**
 
 Sau khi hoàn thành 4 ngày:
 
-1. **Thực hành thêm**: Deploy real applications trên EKS
-2. **Production Setup**: Sử dụng hướng dẫn EKS production trong repo này
-3. **Advanced Topics**: Operators, Service Mesh, GitOps
-4. **Certification**: CKA (Certified Kubernetes Administrator)
-5. **Cleanup**: Dọn dẹp resources sau khi học xong
+1. **Real World Projects**: Deploy production-grade applications với full monitoring
+2. **Advanced Certifications**: CKA, CKS, CKAD
+3. **Service Mesh Mastery**: Istio, Linkerd, Consul Connect
+4. **Cloud Native Ecosystem**: Prometheus, Grafana, Jaeger, Fluentd
+5. **Kubernetes Operators**: Tạo custom operators cho business logic
+6. **Multi-cluster Management**: Federation, Cross-cluster networking
+7. **Security Hardening**: CIS benchmarks, vulnerability scanning
+8. **Performance Tuning**: Resource optimization, cluster sizing
+9. **Cleanup**: Dọn dẹp resources sau khi học xong
    ```bash
-   # Xóa các resources đã tạo
-   kubectl delete all --all
-   kubectl delete pvc --all
-   kubectl delete configmap --all
-   kubectl delete secret --all
+   # Xóa tất cả resources (cẩn thận!)
+   kubectl delete all --all --all-namespaces
+   kubectl delete pvc --all --all-namespaces
+   kubectl delete configmap --all --all-namespaces
+   kubectl delete secret --all --all-namespaces
+   kubectl delete ingress --all --all-namespaces
    ```
 
 ---
 
-**🎉 Chúc bạn học tập thành công với Kubernetes!**
+**🔥 Try Hard Mode Activated! Chúc bạn chinh phục Kubernetes! 🔥**
