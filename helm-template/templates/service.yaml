@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.nameOverride }}-{{ .Values.env }}
+    tier: {{ .Values.env }}-backend
+  name: {{ .Values.nameOverride }}-{{ .Values.env }}
+  namespace : {{ .Release.Namespace }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  {{- if .Values.service.ports }}
+  {{- range .Values.service.ports }}
+  - name: {{ .name }}
+    protocol: {{ default "TCP" .protocol }}
+    port: {{ .port }}
+    targetPort: {{ .targetPort }}
+  {{- end }}
+  {{- else }}
+  - name: {{ .Values.service.nameWebsocket }}
+    protocol: TCP
+    port: {{ .Values.service.portWebsocket }}
+    targetPort: {{ .Values.service.targetPortWebsocket }}
+  - name: {{ .Values.service.nameSocket }}
+    protocol: TCP
+    port: {{ .Values.service.portSocket }}
+    targetPort: {{ .Values.service.targetPortSocket }}   
+  - name: {{ .Values.service.nameWeb }}
+    protocol: TCP
+    port: {{ .Values.service.portWeb }}
+    targetPort: {{ .Values.service.targetPortWeb }}       
+  {{- end }}
+  selector:
+    app: {{ .Values.nameOverride }}-{{ .Values.env }}
+    tier: {{ .Values.env }}-backend
+  sessionAffinity: None

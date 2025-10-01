@@ -1,0 +1,8 @@
+roles:
+  albControllerArn: ""
+  externalDnsArn: ""
+  clusterAutoscalerArn: ""
+  fluentBitArn: ""
+  veleroArn: ""
+
+

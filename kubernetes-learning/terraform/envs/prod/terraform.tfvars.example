@@ -1,0 +1,31 @@
+# Example Terraform variables for EKS production
+# Copy this file to terraform.tfvars and fill in your values
+
+# Cluster configuration
+name           = "my-eks-cluster"
+aws_region     = "ap-southeast-1"
+cluster_version = "1.29"
+
+# VPC configuration
+vpc_cidr       = "10.0.0.0/16"
+azs            = ["ap-southeast-1a", "ap-southeast-1b", "ap-southeast-1c"]
+private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+public_subnets  = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
+
+# Node group configuration
+node_groups = {
+  main = {
+    instance_types = ["t3.medium"]
+    capacity_type  = "ON_DEMAND"
+    min_size      = 1
+    max_size      = 3
+    desired_size  = 2
+  }
+}
+
+# Add-ons
+enable_irsa = true
+enable_aws_load_balancer_controller = true
+enable_cluster_autoscaler = true
+enable_external_dns = true
+enable_velero = true

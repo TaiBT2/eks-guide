@@ -1,0 +1,80 @@
+# Cluster Autoscaler Configuration
+# Sử dụng IRSA role cho Auto Scaling Groups
+
+# Global configuration
+global:
+  imageRegistry: ""
+
+# Service Account với IRSA
+serviceAccount:
+  create: false
+  name: cluster-autoscaler-aws-cluster-autoscaler
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::190749975524:role/prod-eks-cluster-autoscaler"
+
+# Auto Scaling Groups
+autoDiscovery:
+  clusterName: prod-eks
+  enabled: true
+
+# Node groups configuration
+nodeGroups:
+  - name: "prod-eks-on-demand"
+    minSize: 1
+    maxSize: 10
+  - name: "prod-eks-spot"
+    minSize: 0
+    maxSize: 6
+
+# Scaling configuration
+scaleDownDelayAfterAdd: 10m
+scaleDownDelayAfterDelete: 10s
+scaleDownDelayAfterFailure: 3m
+scaleDownUnneededTime: 10m
+scaleDownUtilizationThreshold: 0.5
+skipNodesWithLocalStorage: false
+skipNodesWithSystemPods: true
+
+# Resource limits
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+# Node selector
+nodeSelector:
+  kubernetes.io/os: linux
+
+# Tolerations for spot instances
+tolerations:
+  - key: "eks.amazonaws.com/capacityType"
+    operator: "Equal"
+    value: "SPOT"
+    effect: "NoSchedule"
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 65534
+  runAsNonRoot: true
+  runAsUser: 65534
+
+# Security context
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 65534
+
+# Logging
+logLevel: 4
+logToStderr: true
+stderrThreshold: "INFO"
+
+# AWS specific configuration
+awsRegion: ap-northeast-1

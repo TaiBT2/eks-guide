@@ -1,0 +1,176 @@
+# Fluent Bit Configuration for EKS
+# Fluent Bit thu thập logs từ namespace z-wallet-prod và gửi đến Elasticsearch
+
+# CloudWatch configuration (disabled)
+cloudWatch:
+  enabled: false
+
+# Service Account với IRSA
+serviceAccount:
+  create: true
+  name: fluent-bit
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::190749975524:role/prod-eks-fluent-bit"
+
+# Image configuration (sử dụng mặc định của Helm chart)
+# image:
+#   repository: ""
+#   tag: ""
+#   pullPolicy: IfNotPresent
+
+# Replica count
+replicaCount: 2
+
+# Resource limits
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+# Node selector
+nodeSelector:
+  kubernetes.io/os: linux
+
+# Tolerations for spot instances
+tolerations:
+  - key: "eks.amazonaws.com/capacityType"
+    operator: "Equal"
+    value: "SPOT"
+    effect: "NoSchedule"
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 0
+  runAsNonRoot: false
+  runAsUser: 0
+
+# Security context
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: false
+  runAsUser: 0
+
+# Fluent Bit configuration
+config:
+  service: |
+    [SERVICE]
+        Flush         1
+        Log_Level     info
+        Daemon        off
+        Parsers_File  parsers.conf
+        HTTP_Server   On
+        HTTP_Listen   0.0.0.0
+        HTTP_Port     2020
+        storage.path  /tmp/flb-storage/
+        storage.sync  normal
+        storage.checksum off
+        storage.backlog.mem_limit 5M
+
+  inputs: |
+    [INPUT]
+        Name              tail
+        Tag               kube.*
+        Path              /var/log/containers/*.log
+        Parser            docker
+        DB                /var/log/flb_kube.db
+        Mem_Buf_Limit     5MB
+        Skip_Long_Lines   On
+        Refresh_Interval  10
+
+  filters: |
+    [FILTER]
+        Name                kubernetes
+        Match               kube.*
+        Kube_URL            https://kubernetes.default.svc:443
+        Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
+        Kube_Tag_Prefix     kube.var.log.containers.
+        Merge_Log           On
+        Merge_Log_Key       log_processed
+        K8S-Logging.Parser  On
+        K8S-Logging.Exclude Off
+
+    [FILTER]
+        Name                grep
+        Match               kube.*
+        Regex               kubernetes.namespace_name z-wallet-prod
+
+    [FILTER]
+        Name                record_modifier
+        Match               kube.*
+        Record              cluster_name prod-eks
+        Record              node_name ${NODE_NAME}
+        Record              namespace_name ${NAMESPACE}
+        Record              environment production
+
+  outputs: |
+    [OUTPUT]
+        Name                es
+        Match               kube.*
+        Host                ${ELASTICSEARCH_HOST}
+        Port                ${ELASTICSEARCH_PORT}
+        Index               ${ELASTICSEARCH_INDEX}
+        Type                _doc
+        HTTP_User           ${ELASTICSEARCH_USER}
+        HTTP_Passwd         ${ELASTICSEARCH_PASSWORD}
+        tls                 On
+        tls.verify          Off
+        Logstash_Format     On
+        Logstash_Prefix     z-wallet-prod
+        Logstash_DateFormat %Y.%m.%d
+        Replace_Dots        On
+        Retry_Limit         6
+
+# Pod disruption budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Pod annotations
+podAnnotations: {}
+
+# Pod labels
+podLabels: {}
+
+# Environment variables
+env:
+  - name: NODE_NAME
+    valueFrom:
+      fieldRef:
+        fieldPath: spec.nodeName
+  - name: NAMESPACE
+    valueFrom:
+      fieldRef:
+        fieldPath: metadata.namespace
+  - name: ELASTICSEARCH_HOST
+    valueFrom:
+      secretKeyRef:
+        name: elasticsearch-credentials
+        key: host
+  - name: ELASTICSEARCH_PORT
+    valueFrom:
+      secretKeyRef:
+        name: elasticsearch-credentials
+        key: port
+  - name: ELASTICSEARCH_INDEX
+    valueFrom:
+      secretKeyRef:
+        name: elasticsearch-credentials
+        key: index
+  - name: ELASTICSEARCH_USER
+    valueFrom:
+      secretKeyRef:
+        name: elasticsearch-credentials
+        key: username
+  - name: ELASTICSEARCH_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: elasticsearch-credentials
+        key: password

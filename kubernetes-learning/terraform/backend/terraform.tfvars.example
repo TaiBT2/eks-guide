@@ -1,0 +1,8 @@
+# Example Terraform variables for backend
+# Copy this file to terraform.tfvars and fill in your values
+
+bucket         = "your-terraform-state-bucket"
+key            = "eks/backend/terraform.tfstate"
+region         = "ap-southeast-1"
+dynamodb_table = "terraform-state-lock"
+encrypt        = true

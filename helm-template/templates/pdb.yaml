@@ -1,0 +1,26 @@
+{{- if .Values.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Values.nameOverride }}-{{ .Values.env }}
+  namespace : {{ .Release.Namespace }}
+spec:
+  {{- if hasKey .Values.pdb "minAvailable" }}
+  minAvailable: {{ .Values.pdb.minAvailable }}
+  {{- else if hasKey .Values.pdb "maxUnavailable" }}
+  maxUnavailable: {{ .Values.pdb.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ .Values.nameOverride }}-{{ .Values.env }}
+{{- end }}
+# apiVersion: policy/v1
+# kind: PodDisruptionBudget
+# metadata:
+#   name: {{ .Values.nameOverride }}
+#   namespace : {{ .Values.namespace }}
+# spec:
+#   minAvailable: 2
+#   selector:
+#     matchLabels:
+#       app: {{ .Values.nameOverride }}-{{ .Values.env }}

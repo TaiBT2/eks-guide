@@ -1,0 +1,93 @@
+# Cert-Manager Configuration
+# Sử dụng IRSA role cho AWS Certificate Manager
+
+# Global configuration
+global:
+  leaderElection:
+    namespace: cert-manager
+
+# Service Account với IRSA
+serviceAccount:
+  create: true
+  name: cert-manager
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::190749975524:role/prod-eks-cert-manager"
+
+# Resource limits
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+# Node selector
+nodeSelector:
+  kubernetes.io/os: linux
+
+# Tolerations for spot instances
+tolerations:
+  - key: "eks.amazonaws.com/capacityType"
+    operator: "Equal"
+    value: "SPOT"
+    effect: "NoSchedule"
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 1001
+  runAsNonRoot: true
+  runAsUser: 1001
+
+# Security context
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1001
+
+# Webhook configuration
+webhook:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  nodeSelector:
+    kubernetes.io/os: linux
+  tolerations:
+    - key: "eks.amazonaws.com/capacityType"
+      operator: "Equal"
+      value: "SPOT"
+      effect: "NoSchedule"
+
+# CA Injector configuration
+cainjector:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  nodeSelector:
+    kubernetes.io/os: linux
+  tolerations:
+    - key: "eks.amazonaws.com/capacityType"
+      operator: "Equal"
+      value: "SPOT"
+      effect: "NoSchedule"
+
+# Prometheus monitoring (disabled until Prometheus is installed)
+prometheus:
+  enabled: false
+  servicemonitor:
+    enabled: false
+
+# Logging
+logLevel: 1

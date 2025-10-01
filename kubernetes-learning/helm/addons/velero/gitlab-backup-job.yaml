@@ -1,0 +1,47 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gitlab-backup-manual
+  namespace: velero
+spec:
+  template:
+    spec:
+      serviceAccountName: velero
+      containers:
+      - name: velero-backup
+        image: velero/velero:v1.16.2
+        command:
+        - /velero
+        args:
+        - backup
+        - create
+        - gitlab-manual-backup-$(date +%Y%m%d-%H%M%S)
+        - --include-namespaces
+        - gitlab
+        - --ttl
+        - 7d
+        - --wait
+        env:
+        - name: AWS_ROLE_ARN
+          value: "arn:aws:iam::190749975524:role/prod-eks-velero"
+        - name: AWS_STS_REGIONAL_ENDPOINTS
+          value: "regional"
+        - name: AWS_DEFAULT_REGION
+          value: "ap-northeast-1"
+        - name: AWS_REGION
+          value: "ap-northeast-1"
+        - name: AWS_WEB_IDENTITY_TOKEN_FILE
+          value: "/var/run/secrets/eks.amazonaws.com/serviceaccount/token"
+        volumeMounts:
+        - name: aws-iam-token
+          mountPath: /var/run/secrets/eks.amazonaws.com/serviceaccount
+          readOnly: true
+      volumes:
+      - name: aws-iam-token
+        projected:
+          sources:
+          - serviceAccountToken:
+              audience: sts.amazonaws.com
+              expirationSeconds: 86400
+              path: token
+      restartPolicy: Never

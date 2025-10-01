@@ -1,0 +1,144 @@
+nameOverride: my-app
+fullnameOverride: ""
+
+image:
+  repository: wordpress
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: {}
+
+replicaCount: 2
+restartPolicy: Always
+maxSurge: 1
+maxUnavailable: 0
+
+env: prod
+
+pdb:
+  enabled: true
+  minAvailable: 1
+
+networkPolicy:
+  enabled: false
+  defaultDenyIngress: true
+  defaultDenyEgress: false
+
+serviceAccount:
+  create: false
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::190749975524:role/prod-eks-aws-load-balancer-controller"
+  name: ""
+
+# Ví dụ IRSA nếu workload cần AWS API:
+# serviceAccount:
+#   create: true
+#   annotations:
+#     eks.amazonaws.com/role-arn: "arn:aws:iam::<account-id>:role/<irsa-role-name>"
+
+podAnnotations: {}
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 512Mi
+  limits:
+    cpu: 1
+    memory: 1Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations:
+  enabled: false
+
+affinity: {}
+  # Example node affinity for Karpenter on-demand nodes:
+  # nodeAffinity:
+  #   requiredDuringSchedulingIgnoredDuringExecution:
+  #     nodeSelectorTerms:
+  #       - matchExpressions:
+  #           - key: karpenter.sh/capacity-type
+  #             operator: In
+  #             values:
+  #               - on-demand
+  # Example pod anti-affinity for high availability:
+  # podAntiAffinity:
+  #   preferredDuringSchedulingIgnoredDuringExecution:
+  #     - weight: 100
+  #       podAffinityTerm:
+  #         labelSelector:
+  #           matchExpressions:
+  #             - key: app
+  #               operator: In
+  #               values:
+  #                 - my-app
+  #         topologyKey: kubernetes.io/hostname
+
+service:
+  type: ClusterIP
+  # New flexible ports list (Deployment + Service will use this if present)
+  ports:
+    - name: web
+      port: 80
+      targetPort: 80
+    # - name: websocket
+    #   port: 2208
+    #   targetPort: 2208
+    # - name: metrics
+    #   port: 9100
+    #   targetPort: 9100
+
+ingress:
+  enabled: false
+  className: alb
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/group.name: my-apps
+    alb.ingress.kubernetes.io/load-balancer-attributes: access_logs.s3.enabled=false
+    alb.ingress.kubernetes.io/healthcheck-path: /
+    alb.ingress.kubernetes.io/success-codes: '200-399'
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-northeast-1:190749975524:certificate/669ae917-8245-4c97-8849-05e14b69727b
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: my-app.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+      - my-app.example.com
+      secretName: my-app-tls
+
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: 80
+  initialDelaySeconds: 20
+  timeoutSeconds: 5
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: 80
+  initialDelaySeconds: 10
+  timeoutSeconds: 5
+
+startupProbe:
+  httpGet:
+    path: /
+    port: 80
+  failureThreshold: 30
+  periodSeconds: 10
+
+enableCronScale: false

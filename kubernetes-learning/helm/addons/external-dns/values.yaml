@@ -1,0 +1,71 @@
+# External DNS Configuration
+# Sử dụng IRSA role đã tạo từ Terraform
+
+policy: sync
+registry: txt
+txtOwnerId: prod-eks
+interval: 1m
+provider: aws
+domainFilters: []
+
+# Sources để monitor
+sources:
+  - ingress
+  - service
+  - crd
+
+# Service Account với IRSA
+serviceAccount:
+  create: false
+  name: external-dns
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::190749975524:role/prod-eks-external-dns"
+
+# AWS specific configuration
+aws:
+  region: "ap-northeast-1"
+  zoneType: "public"
+  preferCNAME: false
+  evaluateTargetHealth: true
+
+# Resource limits
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+# Node selector
+nodeSelector:
+  kubernetes.io/os: linux
+
+# Tolerations for spot instances
+tolerations:
+  - key: "eks.amazonaws.com/capacityType"
+    operator: "Equal"
+    value: "SPOT"
+    effect: "NoSchedule"
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 65534
+  runAsNonRoot: true
+  runAsUser: 65534
+
+# Security context
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 65534
+
+# Logging
+logLevel: info
+logFormat: json
+
+

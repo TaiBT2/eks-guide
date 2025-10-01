@@ -1,0 +1,113 @@
+# Terraform
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+.terraform/
+.terraform.lock.hcl
+terraform.tfplan
+terraform.tfplan.*
+
+# Kubernetes
+*.kubeconfig
+kubeconfig-*
+*.pem
+*.key
+*.crt
+*.csr
+
+# Helm
+charts/
+Chart.lock
+.helm/
+
+# AWS
+.aws/
+aws-credentials
+*.pem
+*.key
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp
+
+# Logs
+*.log
+logs/
+
+# Secrets
+secrets/
+*.secret
+*.env
+.env
+
+# Backup files
+*.backup
+*.bak
+*.orig
+
+# Node modules (if any)
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+
+# Temporary files
+*.tmp
+*.temp
+*.lock
+
+# Archive files
+*.tar.gz
+*.zip
+*.rar
+*.7z
+
+# Local development
+.local/
+local/
+dev/
+
+# Monitoring
+prometheus-data/
+grafana-data/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Certificates
+*.p12
+*.pfx
+*.jks
+
+# Scripts output
+output/
+dist/
+build/

@@ -1,0 +1,74 @@
+# AWS Load Balancer Controller Configuration
+# Sử dụng IRSA role đã tạo từ Terraform
+
+clusterName: "prod-eks"
+region: "ap-northeast-1"
+vpcId: "vpc-042f39efb3417ca9b"
+
+serviceAccount:
+  create: false
+  name: aws-load-balancer-controller
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::190749975524:role/prod-eks-alb-controller"
+
+# Security features
+enableShield: false
+enableWaf: true
+enableWafv2: true
+
+# Load balancer configuration
+ingressClassParams:
+  create: true
+  name: "alb"
+  spec:
+    scheme: "internet-facing"
+    ipAddressType: "ipv4"
+    loadBalancerAttributes:
+      - key: "routing.http2.enabled"
+        value: "true"
+      - key: "routing.http.preserve_host_header.enabled"
+        value: "true"
+      - key: "access_logs.s3.enabled"
+        value: "true"
+      - key: "access_logs.s3.bucket"
+        value: "prod-eks-alb-access-logs"
+      - key: "access_logs.s3.prefix"
+        value: "alb"
+
+# Resource limits
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+# Node selector
+nodeSelector:
+  kubernetes.io/os: linux
+
+# Tolerations for spot instances
+tolerations:
+  - key: "eks.amazonaws.com/capacityType"
+    operator: "Equal"
+    value: "SPOT"
+    effect: "NoSchedule"
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 65534
+  runAsNonRoot: true
+  runAsUser: 65534
+
+# Security context
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 65534
+
+
