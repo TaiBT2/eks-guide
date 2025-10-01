@@ -149,9 +149,9 @@ graph TB
         NEW3[New Pod 3]
     end
     
-    OLD1 --> NEW1 : Replace
-    OLD2 --> NEW2 : Replace
-    OLD3 --> NEW3 : Replace
+    OLD1 --> NEW1
+    OLD2 --> NEW2
+    OLD3 --> NEW3
     
     subgraph "Blue-Green Deployment"
         BLUE[Blue Environment<br/>Current Version]
@@ -160,7 +160,7 @@ graph TB
     end
     
     LB --> BLUE
-    LB -.-> GREEN : Switch traffic
+    LB -.-> GREEN
 ```
 
 ## **Storage Architecture**
