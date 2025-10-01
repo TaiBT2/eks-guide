@@ -122,10 +122,24 @@ spec:
 ```
 
 ### **4. ConfigMaps - Configuration Management**
-#### **ConfigMap Concepts:**
+#### **ConfigMap là gì?**
+- **API object** để store non-confidential data
+- **Key-value pairs** cho configuration data
 - **Decouple configuration** from application code
 - **Environment-specific** configurations
-- **Volume mounting** hoặc environment variables
+
+#### **Tại sao cần ConfigMaps?**
+- **Separation of concerns**: Tách config khỏi application code
+- **Environment management**: Different configs cho dev/staging/prod
+- **Configuration updates**: Update config mà không cần rebuild image
+- **Reusability**: Share config giữa multiple pods
+- **Version control**: Track configuration changes
+
+#### **ConfigMap Use Cases:**
+- **Application settings**: Database URLs, API endpoints
+- **Feature flags**: Enable/disable features
+- **Logging configuration**: Log levels, output formats
+- **Environment variables**: Non-sensitive environment data
 
 #### **Tạo ConfigMap:**
 ```bash
@@ -186,11 +200,24 @@ volumes:
 ```
 
 ### **5. Secrets - Sensitive Data Management**
+#### **Secrets là gì?**
+- **API object** để store sensitive data
+- **Base64 encoded** (không phải encrypted)
+- **Similar to ConfigMaps** nhưng cho sensitive data
+- **Automatic mounting** vào pods
+
+#### **Tại sao cần Secrets?**
+- **Security**: Store passwords, API keys, certificates
+- **Separation**: Tách sensitive data khỏi application code
+- **Access control**: RBAC để control access
+- **Encryption**: Có thể encrypt at rest với encryption providers
+
 #### **Secret Types:**
-- **Opaque**: Arbitrary user data
+- **Opaque**: Arbitrary user data (default)
 - **kubernetes.io/service-account-token**: Service account token
 - **kubernetes.io/dockercfg**: Docker registry credentials
 - **kubernetes.io/tls**: TLS certificate
+- **kubernetes.io/ssh-auth**: SSH keys
 
 #### **Tạo Secrets:**
 ```bash
@@ -246,11 +273,25 @@ volumes:
 ```
 
 ### **6. Volumes & Persistent Storage**
+#### **Volumes là gì?**
+- **Storage abstraction** cho pods
+- **Lifecycle independent** của pods
+- **Multiple types** cho different use cases
+- **Mount points** trong containers
+
+#### **Tại sao cần Volumes?**
+- **Data persistence**: Data survive pod restarts
+- **Data sharing**: Share data giữa containers trong pod
+- **Configuration**: Mount config files và secrets
+- **Backup**: Persistent data có thể backup
+
 #### **Volume Types:**
-- **emptyDir**: Temporary storage
-- **hostPath**: Node filesystem
-- **persistentVolumeClaim**: Persistent storage
+- **emptyDir**: Temporary storage (pod lifecycle)
+- **hostPath**: Node filesystem (development only)
+- **persistentVolumeClaim**: Persistent storage (production)
 - **configMap/secret**: Configuration data
+- **downwardAPI**: Pod metadata
+- **projected**: Multiple volume sources
 
 #### **PersistentVolume (PV):**
 ```yaml
@@ -305,6 +346,33 @@ volumes:
 ```
 
 ### **7. StatefulSets - Stateful Applications**
+#### **StatefulSets là gì?**
+- **Workload API object** cho stateful applications
+- **Stable, unique network identifiers** cho pods
+- **Stable, persistent storage** cho pods
+- **Ordered, graceful deployment** và scaling
+
+#### **Tại sao cần StatefulSets?**
+- **Database applications**: MySQL, PostgreSQL, MongoDB
+- **Distributed systems**: Elasticsearch, Kafka clusters
+- **Stable identity**: Pods có stable hostname và storage
+- **Ordered operations**: Deploy, scale, update theo thứ tự
+
+#### **StatefulSet Features:**
+- **Stable network identity**: Pod name + ordinal
+- **Stable storage**: PersistentVolumeClaim template
+- **Ordered deployment**: Pods created theo thứ tự
+- **Ordered scaling**: Pods terminated theo thứ tự ngược
+- **Ordered updates**: Rolling updates theo thứ tự
+
+#### **StatefulSet vs Deployment:**
+| Feature | Deployment | StatefulSet |
+|---------|------------|-------------|
+| Pod identity | Random | Stable |
+| Storage | Ephemeral | Persistent |
+| Scaling | Any order | Ordered |
+| Updates | Rolling | Ordered rolling |
+| Use case | Stateless apps | Stateful apps |
 ```yaml
 # statefulset-example.yaml
 apiVersion: apps/v1
@@ -347,6 +415,29 @@ spec:
 ```
 
 ### **8. Horizontal Pod Autoscaler (HPA)**
+#### **HPA là gì?**
+- **Automatic scaling** dựa trên metrics
+- **Horizontal scaling**: Tăng/giảm số pods
+- **Resource-based scaling**: CPU, memory, custom metrics
+- **Target utilization**: Maintain target resource usage
+
+#### **Tại sao cần HPA?**
+- **Cost optimization**: Scale down khi ít traffic
+- **Performance**: Scale up khi high load
+- **Automation**: Không cần manual intervention
+- **Resource efficiency**: Right-size applications
+
+#### **HPA Metrics:**
+- **Resource metrics**: CPU, memory usage
+- **Pods metrics**: Pod-level metrics
+- **Object metrics**: Ingress, Service metrics
+- **External metrics**: Custom application metrics
+
+#### **HPA Scaling Behavior:**
+- **Scale up**: Khi metrics > target
+- **Scale down**: Khi metrics < target
+- **Cooldown periods**: Prevent rapid scaling
+- **Stabilization**: Gradual scaling changes
 ```yaml
 # hpa-example.yaml
 apiVersion: autoscaling/v2
@@ -376,6 +467,28 @@ spec:
 ```
 
 ### **9. Jobs và CronJobs**
+#### **Jobs là gì?**
+- **One-time tasks** hoặc batch jobs
+- **Run to completion**: Job chạy đến khi hoàn thành
+- **Parallel execution**: Multiple pods cho parallel processing
+- **Retry mechanism**: Retry failed jobs
+
+#### **Tại sao cần Jobs?**
+- **Batch processing**: Data processing, ETL jobs
+- **One-time tasks**: Database migrations, cleanup
+- **Parallel processing**: Distribute work across pods
+- **Reliability**: Automatic retry on failure
+
+#### **CronJobs là gì?**
+- **Scheduled Jobs**: Chạy jobs theo schedule
+- **Cron syntax**: Standard cron expressions
+- **Time-based execution**: Daily, weekly, monthly tasks
+- **Job history**: Keep track of job executions
+
+#### **Job Types:**
+- **Non-parallel Jobs**: Single pod, run once
+- **Parallel Jobs with fixed completion count**: Multiple pods, fixed completion
+- **Parallel Jobs with work queue**: Multiple pods, process queue
 ```yaml
 # job-example.yaml
 apiVersion: batch/v1
@@ -413,6 +526,29 @@ spec:
 ```
 
 ### **10. Resource Quotas và Limits**
+#### **Resource Quotas là gì?**
+- **Namespace-level resource limits**: Giới hạn resources per namespace
+- **Prevent resource exhaustion**: Tránh một namespace chiếm hết resources
+- **Multi-tenancy**: Isolate resources giữa teams/projects
+- **Cost control**: Control resource usage và costs
+
+#### **Tại sao cần Resource Quotas?**
+- **Resource isolation**: Prevent resource conflicts
+- **Fair sharing**: Ensure fair resource distribution
+- **Cost management**: Control resource costs
+- **Security**: Prevent resource abuse
+
+#### **Resource Quota Types:**
+- **Compute resources**: CPU, memory requests/limits
+- **Storage resources**: PersistentVolumeClaims
+- **Object counts**: Pods, Services, ConfigMaps, Secrets
+- **Extended resources**: GPU, custom resources
+
+#### **LimitRanges là gì?**
+- **Default resource limits**: Set default requests/limits
+- **Resource constraints**: Min/max resource values
+- **Container-level limits**: Per-container resource limits
+- **Namespace-wide defaults**: Apply to all containers
 ```yaml
 # resourcequota-example.yaml
 apiVersion: v1
