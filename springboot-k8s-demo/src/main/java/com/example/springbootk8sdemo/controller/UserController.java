@@ -63,7 +63,7 @@ public class UserController {
     
     // Show user details
     @GetMapping("/{id}")
-    public String getUserById(@PathVariable Long id, Model model) {
+    public String getUserById(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         Optional<User> user = userService.getUserById(id);
         if (user.isPresent()) {
             model.addAttribute("user", user.get());
