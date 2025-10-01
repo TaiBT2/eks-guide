@@ -7,7 +7,6 @@ Hướng dẫn học Kubernetes trong 4 ngày dành cho developers - từ cơ b�
 ### **Ngày 1: Kubernetes Fundamentals** 🎯
 **Mục tiêu**: Hiểu các khái niệm cơ bản của Kubernetes
 
-#### **Buổi sáng (2-3 giờ)**
 - [ ] **Kubernetes là gì?**
   - Container orchestration
   - Microservices architecture
@@ -18,23 +17,15 @@ Hướng dẫn học Kubernetes trong 4 ngày dành cho developers - từ cơ b�
   - API Server, etcd, Scheduler, Controller Manager
   - kubelet, kube-proxy, Container Runtime
 
-- [ ] **Cài đặt môi trường**
+- [ ] **Kết nối EKS cluster có sẵn**
   ```bash
-  # Cài đặt kubectl
-  curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-  chmod +x kubectl
-  sudo mv kubectl /usr/local/bin/
+  # Cấu hình kubeconfig cho EKS
+  aws eks update-kubeconfig --region ap-southeast-1 --name your-cluster-name
   
-  # Cài đặt minikube (local development)
-  curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-  chmod +x minikube
-  sudo mv minikube /usr/local/bin/
-  
-  # Khởi động minikube
-  minikube start
+  # Kiểm tra kết nối
+  kubectl get nodes
+  kubectl get pods --all-namespaces
   ```
-
-#### **Buổi chiều (2-3 giờ)**
 - [ ] **Pods - Đơn vị nhỏ nhất**
   ```yaml
   # pod-example.yaml
@@ -82,17 +73,16 @@ Hướng dẫn học Kubernetes trong 4 ngày dành cho developers - từ cơ b�
     type: ClusterIP
   ```
 
-#### **Bài tập ngày 1**
-- Tạo 3 pods nginx khác nhau
-- Tạo service để kết nối các pods
-- Test connectivity giữa các pods
+- [ ] **Bài tập ngày 1**
+  - Tạo 3 pods nginx khác nhau
+  - Tạo service để kết nối các pods
+  - Test connectivity giữa các pods
 
 ---
 
 ### **Ngày 2: Deployments & Scaling** 📈
 **Mục tiêu**: Học cách quản lý ứng dụng với Deployments
 
-#### **Buổi sáng (2-3 giờ)**
 - [ ] **Deployments - Quản lý Pods**
   ```yaml
   # deployment-example.yaml
@@ -136,7 +126,6 @@ Hướng dẫn học Kubernetes trong 4 ngày dành cho developers - từ cơ b�
   kubectl rollout undo deployment/nginx-deployment
   ```
 
-#### **Buổi chiều (2-3 giờ)**
 - [ ] **ConfigMaps & Secrets**
   ```yaml
   # configmap-example.yaml
@@ -176,18 +165,17 @@ Hướng dẫn học Kubernetes trong 4 ngày dành cho developers - từ cơ b�
         storage: 1Gi
   ```
 
-#### **Bài tập ngày 2**
-- Tạo deployment với 3 replicas
-- Thêm ConfigMap và Secret
-- Mount volume vào pod
-- Test rolling update và rollback
+- [ ] **Bài tập ngày 2**
+  - Tạo deployment với 3 replicas
+  - Thêm ConfigMap và Secret
+  - Mount volume vào pod
+  - Test rolling update và rollback
 
 ---
 
 ### **Ngày 3: Networking & Ingress** 🌐
 **Mục tiêu**: Hiểu networking và expose services
 
-#### **Buổi sáng (2-3 giờ)**
 - [ ] **Services Types**
   ```yaml
   # service-types.yaml
@@ -225,17 +213,36 @@ Hướng dẫn học Kubernetes trong 4 ngày dành cho developers - từ cơ b�
                 number: 80
   ```
 
-#### **Buổi chiều (2-3 giờ)**
 - [ ] **Cài đặt Ingress Controller**
   ```bash
-  # Cài đặt NGINX Ingress Controller
-  kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/cloud/deploy.yaml
+  # Cài đặt NGINX Ingress Controller với Helm
+  helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+  helm repo update
+  
+  helm install ingress-nginx ingress-nginx/ingress-nginx \
+    --namespace ingress-nginx \
+    --create-namespace \
+    --set controller.service.type=LoadBalancer \
+    --set controller.service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-type"=nlb
   
   # Kiểm tra
   kubectl get pods -n ingress-nginx
+  kubectl get svc -n ingress-nginx
   ```
 
 - [ ] **SSL/TLS với cert-manager**
+  ```bash
+  # Cài đặt cert-manager
+  helm repo add jetstack https://charts.jetstack.io
+  helm repo update
+  
+  helm install cert-manager jetstack/cert-manager \
+    --namespace cert-manager \
+    --create-namespace \
+    --version v1.13.0 \
+    --set installCRDs=true
+  ```
+
   ```yaml
   # cert-manager.yaml
   apiVersion: cert-manager.io/v1
@@ -268,18 +275,17 @@ Hướng dẫn học Kubernetes trong 4 ngày dành cho developers - từ cơ b�
     - Egress
   ```
 
-#### **Bài tập ngày 3**
-- Tạo 2 applications khác nhau
-- Expose chúng qua Ingress với different paths
-- Cấu hình SSL certificate
-- Test network policies
+- [ ] **Bài tập ngày 3**
+  - Tạo 2 applications khác nhau
+  - Expose chúng qua Ingress với different paths
+  - Cấu hình SSL certificate
+  - Test network policies
 
 ---
 
 ### **Ngày 4: Production & DevOps** 🚀
 **Mục tiêu**: Chuẩn bị cho production và CI/CD
 
-#### **Buổi sáng (2-3 giờ)**
 - [ ] **Helm - Package Manager**
   ```bash
   # Cài đặt Helm
@@ -308,7 +314,6 @@ Hướng dẫn học Kubernetes trong 4 ngày dành cho developers - từ cơ b�
   kubectl port-forward svc/prometheus-grafana 3000:80
   ```
 
-#### **Buổi chiều (2-3 giờ)**
 - [ ] **CI/CD với GitHub Actions**
   ```yaml
   # .github/workflows/deploy.yml
@@ -332,11 +337,11 @@ Hướng dẫn học Kubernetes trong 4 ngày dành cho developers - từ cơ b�
   - Security contexts
   - RBAC (Role-Based Access Control)
 
-#### **Bài tập ngày 4**
-- Tạo Helm chart cho ứng dụng
-- Cấu hình monitoring
-- Thiết lập CI/CD pipeline
-- Áp dụng security best practices
+- [ ] **Bài tập ngày 4**
+  - Tạo Helm chart cho ứng dụng
+  - Cấu hình monitoring
+  - Thiết lập CI/CD pipeline
+  - Áp dụng security best practices
 
 ---
 
@@ -344,7 +349,8 @@ Hướng dẫn học Kubernetes trong 4 ngày dành cho developers - từ cơ b�
 
 ### **Essential Tools**
 - **kubectl**: Kubernetes command-line tool
-- **minikube**: Local Kubernetes cluster
+- **eksctl**: EKS cluster management
+- **AWS CLI**: AWS command-line interface
 - **k9s**: Terminal UI for Kubernetes
 - **Helm**: Package manager for Kubernetes
 
@@ -355,8 +361,8 @@ Hướng dẫn học Kubernetes trong 4 ngày dành cho developers - từ cơ b�
 - [Katacoda Kubernetes Scenarios](https://www.katacoda.com/courses/kubernetes)
 
 ### **Practice Platforms**
-- **Local**: minikube, kind, k3s
-- **Cloud**: EKS, GKE, AKS
+- **AWS EKS**: Managed Kubernetes on AWS (Khuyến nghị)
+- **Other Cloud**: GKE, AKS
 - **Online**: Play with Kubernetes, Katacoda
 
 ---
@@ -365,7 +371,8 @@ Hướng dẫn học Kubernetes trong 4 ngày dành cho developers - từ cơ b�
 
 ### **Ngày 1 Checklist**
 - [ ] Hiểu kiến trúc Kubernetes
-- [ ] Cài đặt môi trường development
+- [ ] Kết nối EKS cluster có sẵn
+- [ ] Cấu hình kubeconfig
 - [ ] Tạo và quản lý Pods
 - [ ] Tạo Services
 - [ ] Test connectivity
@@ -411,10 +418,18 @@ Sau 4 ngày, bạn sẽ có thể:
 
 Sau khi hoàn thành 4 ngày:
 
-1. **Thực hành thêm**: Deploy real applications
-2. **Cloud Platforms**: EKS, GKE, AKS
-3. **Advanced Topics**: Operators, Service Mesh
+1. **Thực hành thêm**: Deploy real applications trên EKS
+2. **Production Setup**: Sử dụng hướng dẫn EKS production trong repo này
+3. **Advanced Topics**: Operators, Service Mesh, GitOps
 4. **Certification**: CKA (Certified Kubernetes Administrator)
+5. **Cleanup**: Dọn dẹp resources sau khi học xong
+   ```bash
+   # Xóa các resources đã tạo
+   kubectl delete all --all
+   kubectl delete pvc --all
+   kubectl delete configmap --all
+   kubectl delete secret --all
+   ```
 
 ---
 
