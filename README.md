@@ -15,7 +15,8 @@ Repository này được tạo ra để:
 
 ### 🏁 Bắt đầu với hướng dẫn chi tiết
 👉 **[Hướng dẫn Setup EKS từ A-Z](./eks-setup-guide.md)** - Hướng dẫn step-by-step hoàn chỉnh  
-👉 **[Kubernetes 4-Day Learning Guide](./k8s-4day-learning-guide.md)** - Học Kubernetes trong 4 ngày cho developers
+👉 **[Kubernetes 4-Day Learning Guide](./k8s-4day-learning-guide.md)** - Học Kubernetes trong 4 ngày cho developers  
+👉 **[K8s Learning Path](./k8s-learning-path/README.md)** - Lộ trình học có cấu trúc từng ngày với bài tập chi tiết
 
 ### 🧩 Các khái niệm Kubernetes cơ bản
 
@@ -88,6 +89,11 @@ spec:
 📁 system-prod/
 ├── 📖 eks-setup-guide.md          # Hướng dẫn setup EKS chi tiết
 ├── 📖 k8s-4day-learning-guide.md  # Học Kubernetes trong 4 ngày
+├── 📁 k8s-learning-path/          # Lộ trình học có cấu trúc
+│   ├── 📁 day-1/                  # Ngày 1: Fundamentals
+│   ├── 📁 day-2/                  # Ngày 2: Deployments & Scaling
+│   ├── 📁 day-3/                  # Ngày 3: Networking & Ingress
+│   └── 📁 day-4/                  # Ngày 4: Production & DevOps
 ├── 📁 kubernetes-learning/        # Kubernetes Learning Materials
 │   ├── 📁 helm/                   # Helm charts cho add-ons
 │   ├── 📁 manifests/              # Kubernetes manifests mẫu
