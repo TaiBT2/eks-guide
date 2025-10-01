@@ -57,6 +57,7 @@ Sau khi hoàn thành 4 ngày, bạn sẽ có thể:
 - [Kubernetes Official Docs](https://kubernetes.io/docs/)
 - [EKS Setup Guide](../eks-setup-guide.md)
 - [Kubernetes by Example](https://kubernetesbyexample.com/)
+- [🏗️ Kubernetes Architecture Diagrams](./kubernetes-architecture.md) - Visual diagrams cho kiến trúc K8s
 
 ---
 

@@ -12,6 +12,8 @@
 - **Use cases**: Web apps, APIs, databases, ML workloads
 
 ### **2. Kiến trúc Kubernetes**
+> 📊 **Xem [Architecture Diagrams](../kubernetes-architecture.md) để hiểu rõ hơn về kiến trúc**
+
 #### **Control Plane Components:**
 - **API Server**: REST API endpoint cho tất cả operations
 - **etcd**: Distributed key-value store cho cluster state
